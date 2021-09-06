@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+	<mapper namespace="boardMapper">
+		
+		<select id="getDate" resultType="String">
+			<![CDATA[
+				select now()
+			]]>
+		</select>
+		
+		<select id="getNext" resultType="int">
+			<![CDATA[
+				select boardID from board order by boardID desc limit 1
+			]]>
+		</select>
+		
+		<insert id="write" parameterType="boardVO">
+			<![CDATA[
+				insert into board(boardID, boardTitle, userID, boardDate, boardContent, boardAvailable)
+					values(#{boardID}, #{boardTitle}, #{userID}, #{boardDate}, #{boardContent}, #{boardAvailable})
+			]]>
+		</insert>
+		
+		<select id="getList" parameterType="int" resultType="boardVO">
+			<![CDATA[
+				select * from board
+				where boardID < #{pageNumber} and boardAvailable = 1
+				order by boardID desc
+				limit 10
+			]]>
+		</select>
+		
+		<select id="getMyList" parameterType="String" resultType="boardVO">
+			<![CDATA[
+				select * from board
+				where userID = #{userID} and boardAvailable = 1
+				order by boardID desc
+			]]>
+		</select>
+		
+		<resultMap type="map" id="selectMapList">
+			<result column="boardID" property="boardID"/>
+			<result column="boardTitle" property="boardTitle"/>
+			<result column="userID" property="userID"/>
+			<result column="boardDate" property="boardDate"/>
+			<result column="boardContent" property="boardContent"/>
+			<result column="boardAvailable" property="boardAvailable"/>
+		</resultMap>
+		
+		<select id="nextPage" resultType="boolean"> <!-- 다음에 조회되는 게시글이 있으면 1을 반환 -->
+		<![CDATA[
+			select if(count(*)=0, 0, 1) from board 
+				where boardID < #{pageNumber} and boardAvailable = 1		
+		]]>
+		</select>
+		
+		<select id="selectPost" resultType="boardVO">
+		<![CDATA[
+			select * from board
+				where boardID = #{boardID}
+		]]>
+		</select>
+		
+		<insert id="boardWrite" parameterType="boardVO">
+			<![CDATA[
+				insert into board(boardID, boardTitle, userID, boardDate, boardContent, boardAvailable)
+					values(#{boardID}, #{boardTitle}, #{userID}, #{boardDate}, #{boardContent}, #{boardAvailable})
+			]]>
+		</insert>
+		
+		<update id="boardUpdate" parameterType="boardVO">
+			<![CDATA[
+				update board set boardTitle=#{boardTitle}, boardDate=#{boardDate}, boardContent=#{boardContent} where boardID=#{boardID}
+			]]>
+		</update>
+		
+		<update id="delete" parameterType="boardVO">
+			<![CDATA[
+				update board set boardAvailable=#{boardAvailable} where boardID=#{boardID}
+			]]>
+		</update>
+				
+	</mapper>
